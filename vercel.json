@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "rewrites": [
+    {
+      "source": "/api/sse",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/messages",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/sse",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/messages",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}
