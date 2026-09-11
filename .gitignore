@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.log
+*.log.jsonl
+audit.log.jsonl
+.DS_Store
+Thumbs.db
+
+# Test-generated workspaces
+Nstok-app-*
+Nstok-feature-*

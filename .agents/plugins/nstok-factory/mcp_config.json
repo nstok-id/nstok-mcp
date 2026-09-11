@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "nstok-software-factory": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "NODE_ENV": "development",
+        "ENABLE_AUDIT_LOG": "true"
+      }
+    }
+  }
+}
