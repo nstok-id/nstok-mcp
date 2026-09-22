@@ -1,0 +1,47 @@
+name: Auto-Sync Knowledge Master
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  sync-knowledge:
+    name: Extract AST & Sync to Knowledge Master
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 🌲 Extract Code AST & Markdown Documents
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: node scripts/extract-knowledge.mjs
+
+      - name: 🚀 Dispatch Payload to Knowledge Master Webhook
+        env:
+          SYNC_URL: ${{ secrets.KNOWLEDGE_SYNC_URL || 'https://mcp.nstok.my.id/api/sync-knowledge' }}
+          SYNC_SECRET: ${{ secrets.KNOWLEDGE_SYNC_SECRET || 'nstok_sec_token_v2_prod_99218' }}
+        run: |
+          echo "🚀 Mengirimkan knowledge-payload.json ke $SYNC_URL..."
+          HTTP_CODE=$(curl -s -o resp.json -w "%{http_code}" -X POST "$SYNC_URL" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $SYNC_SECRET" \
+            -d @knowledge-payload.json)
+
+          echo "HTTP Response Status: $HTTP_CODE"
+          cat resp.json
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ]; then
+            echo "🎉 Sinkronisasi ke Knowledge Master BERHASIL!"
+          else
+            echo "⚠️ Server webhook response: $HTTP_CODE"
+          fi
